@@ -135,6 +135,9 @@ func (p *parser) parseStatement() ast.Node {
 	case lexer.TokenOpenPartial:
 		// partial
 		result = p.parsePartial()
+	case lexer.TokenOpenDecoratorBlock:
+		// decorator block (inline partial)
+		result = p.parseDecoratorBlock()
 	case lexer.TokenContent:
 		// content
 		result = p.parseContent()
@@ -155,7 +158,7 @@ func (p *parser) isStatement() bool {
 	switch p.next().Kind {
 	case lexer.TokenOpen, lexer.TokenOpenUnescaped, lexer.TokenOpenBlock,
 		lexer.TokenOpenInverse, lexer.TokenOpenRawBlock, lexer.TokenOpenPartial,
-		lexer.TokenContent, lexer.TokenComment:
+		lexer.TokenOpenDecoratorBlock, lexer.TokenContent, lexer.TokenComment:
 		return true
 	}
 
@@ -843,4 +846,21 @@ func (p *parser) isInverse() bool {
 // isOpenInverseChain returns true if next token is OPEN_INVERSE_CHAIN
 func (p *parser) isOpenInverseChain() bool {
 	return p.isToken(lexer.TokenOpenInverseChain)
+}
+
+// decoratorBlock : OPEN_DECORATOR_BLOCK helperName param* hash? CLOSE program closeBlock
+func (p *parser) parseDecoratorBlock() *ast.BlockStatement {
+	tok := p.shift()
+	result := ast.NewBlockStatement(tok.Pos, tok.Line)
+	result.Decorator = true
+	result.Expression = p.parseExpression(tok)
+	tokClose := p.shift()
+	if tokClose.Kind != lexer.TokenClose {
+		errExpected(lexer.TokenClose, tokClose)
+	}
+	result.OpenStrip = ast.NewStrip(tok.Val, tokClose.Val)
+	program := p.parseProgram()
+	result.Program = program
+	p.parseCloseBlock(result)
+	return result
 }

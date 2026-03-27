@@ -63,6 +63,8 @@ var (
 	rOpenEndRawLookAhead = regexp.MustCompile(`\{\{\{\{/`)
 	rOpenUnescaped       = regexp.MustCompile(`^\{\{~?\{`)
 	rCloseUnescaped      = regexp.MustCompile(`^\}~?\}\}`)
+	rOpenDecoratorBlock  = regexp.MustCompile(`^\{\{~?#\*`)
+	rOpenBlockPartial    = regexp.MustCompile(`^\{\{~?#>`)
 	rOpenBlock           = regexp.MustCompile(`^\{\{~?#`)
 	rOpenEndBlock        = regexp.MustCompile(`^\{\{~?/`)
 	rOpenPartial         = regexp.MustCompile(`^\{\{~?>`)
@@ -343,6 +345,11 @@ func lexOpenMustache(l *Lexer) lexFunc {
 		l.rawBlock = true
 	} else if str = l.findRegexp(rOpenUnescaped); str != "" {
 		tok = TokenOpenUnescaped
+	} else if str = l.findRegexp(rOpenDecoratorBlock); str != "" {
+		tok = TokenOpenDecoratorBlock
+	} else if str = l.findRegexp(rOpenBlockPartial); str != "" {
+		// {{#> (block partial) - must be checked before rOpenBlock
+		tok = TokenOpenBlockPartial
 	} else if str = l.findRegexp(rOpenBlock); str != "" {
 		tok = TokenOpenBlock
 	} else if str = l.findRegexp(rOpenEndBlock); str != "" {

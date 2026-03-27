@@ -40,6 +40,8 @@ type evalVisitor struct {
 	// memoize expressions that were function calls
 	exprFunc map[*ast.Expression]bool
 
+	inlinePartials map[string]*partial
+
 	// used for info on panic
 	curNode ast.Node
 }
@@ -57,7 +59,8 @@ func newEvalVisitor(tpl *Template, ctx interface{}, privData *DataFrame) *evalVi
 		tpl:       tpl,
 		ctx:       []reflect.Value{reflect.ValueOf(ctx)},
 		dataFrame: frame,
-		exprFunc:  make(map[*ast.Expression]bool),
+		exprFunc:       make(map[*ast.Expression]bool),
+		inlinePartials: make(map[string]*partial),
 	}
 }
 
@@ -682,6 +685,9 @@ func (v *evalVisitor) helperOptions(node *ast.Expression) *Options {
 
 // findPartial finds given partial
 func (v *evalVisitor) findPartial(name string) *partial {
+	if p, ok := v.inlinePartials[name]; ok {
+		return p
+	}
 	// check template partials
 	if p := v.tpl.findPartial(name); p != nil {
 		return p
@@ -817,7 +823,9 @@ func (v *evalVisitor) VisitMustache(node *ast.MustacheStatement) interface{} {
 // VisitBlock implements corresponding Visitor interface method
 func (v *evalVisitor) VisitBlock(node *ast.BlockStatement) interface{} {
 	v.at(node)
-
+	if node.Decorator {
+		return v.visitDecoratorBlock(node)
+	}
 	v.pushBlock(node)
 
 	var result interface{}
@@ -864,6 +872,25 @@ func (v *evalVisitor) VisitBlock(node *ast.BlockStatement) interface{} {
 }
 
 // VisitPartial implements corresponding Visitor interface method
+func (v *evalVisitor) visitDecoratorBlock(node *ast.BlockStatement) interface{} {
+	helperName := node.Expression.HelperName()
+	if helperName != "inline" {
+		v.errorf("Unsupported decorator: %s", helperName)
+	}
+	if len(node.Expression.Params) != 1 {
+		v.errorf("inline decorator requires exactly one argument (the partial name)")
+	}
+	name, ok := node.Expression.Params[0].Accept(v).(string)
+	if !ok || name == "" {
+		v.errorf("inline decorator argument must be a string")
+	}
+	if node.Program != nil {
+		tpl := NewTemplateFromAST(node.Program)
+		v.inlinePartials[name] = newPartial(name, "", tpl)
+	}
+	return ""
+}
+
 func (v *evalVisitor) VisitPartial(node *ast.PartialStatement) interface{} {
 	v.at(node)
 

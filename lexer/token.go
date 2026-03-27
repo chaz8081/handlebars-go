@@ -52,6 +52,12 @@ const (
 	// TokenOpenPartial is the OPEN_PARTIAL token
 	TokenOpenPartial
 
+	// TokenOpenBlockPartial is the OPEN_BLOCK_PARTIAL token (e.g. {{#>)
+	TokenOpenBlockPartial
+
+	// TokenOpenDecoratorBlock is the OPEN_DECORATOR_BLOCK token (e.g. {{#*)
+	TokenOpenDecoratorBlock
+
 	// TokenComment is the COMMENT token
 	TokenComment
 
@@ -141,6 +147,8 @@ var tokenName = map[TokenKind]string{
 	TokenOpenInverse:      "OpenInverse",
 	TokenOpenInverseChain: "OpenInverseChain",
 	TokenOpenPartial:      "OpenPartial",
+	TokenOpenBlockPartial: "OpenBlockPartial",
+	TokenOpenDecoratorBlock: "OpenDecoratorBlock",
 	TokenOpenSexpr:        "OpenSexpr",
 	TokenCloseSexpr:       "CloseSexpr",
 	TokenID:               "ID",
