@@ -235,6 +235,9 @@ type BlockStatement struct {
 	Program *Program
 	Inverse *Program
 
+	// Decorator is true when this block is a decorator (e.g. {{#*inline "name"}}...{{/inline}})
+	Decorator bool
+
 	// whitespace management
 	OpenStrip    *Strip
 	InverseStrip *Strip
