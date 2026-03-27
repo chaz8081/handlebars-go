@@ -7,8 +7,8 @@ import (
 	"runtime"
 	"sync"
 
-	"github.com/flowchartsman/handlebars/v3/ast"
-	"github.com/flowchartsman/handlebars/v3/parser"
+	"github.com/chaz8081/handlebars-go/v3/ast"
+	"github.com/chaz8081/handlebars-go/v3/parser"
 )
 
 // Template represents a handlebars template.
