@@ -1365,6 +1365,37 @@ You can use following utility fuctions to parse and register partials from files
 - `Template.RegisterPartialFiles()` - reads several files and registers them as partials, the filename base is used as the partial name
 
 
+## Sub-packages
+
+The module provides sub-packages for template analysis and validation that operate on parsed ASTs independently of the rendering engine:
+
+### `analysis` — Variable Extraction
+
+```go
+import (
+    "github.com/chaz8081/hbs/v4"
+    "github.com/chaz8081/hbs/v4/analysis"
+)
+
+tpl := handlebars.MustParse("{{#if premium}}{{billing.plan}}{{/if}}")
+vars := analysis.ExtractVariables(tpl.AST(), nil)
+// vars contains: premium (required), billing.plan (conditional on premium)
+```
+
+### `validate` — Data Validation
+
+```go
+import (
+    "github.com/chaz8081/hbs/v4"
+    "github.com/chaz8081/hbs/v4/validate"
+)
+
+tpl := handlebars.MustParse("{{firstName}} {{lastName}}")
+errs := validate.Validate(tpl.AST(), map[string]interface{}{"firstName": "Alice"}, nil)
+// errs contains: required field missing: lastName
+```
+
+
 ## CLI Tools
 
 This module ships with three CLI tools for working with Handlebars templates in Go projects. Install them with:

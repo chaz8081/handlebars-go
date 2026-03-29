@@ -1,35 +1,37 @@
-package handlebars
+package analysis
 
 import (
 	"sort"
 	"testing"
+
+	handlebars "github.com/chaz8081/hbs/v4"
 )
 
 func TestExtractVariables_SimpleVariable(t *testing.T) {
-	tpl := MustParse("Hello {{name}}")
-	vars := ExtractVariables(tpl, nil)
+	tpl := handlebars.MustParse("Hello {{name}}")
+	vars := ExtractVariables(tpl.AST(), nil)
 
 	assertHasVar(t, vars, "name", true, nil)
 }
 
 func TestExtractVariables_MultipleVariables(t *testing.T) {
-	tpl := MustParse("{{firstName}} {{lastName}}")
-	vars := ExtractVariables(tpl, nil)
+	tpl := handlebars.MustParse("{{firstName}} {{lastName}}")
+	vars := ExtractVariables(tpl.AST(), nil)
 
 	assertHasVar(t, vars, "firstName", true, nil)
 	assertHasVar(t, vars, "lastName", true, nil)
 }
 
 func TestExtractVariables_DottedPath(t *testing.T) {
-	tpl := MustParse("{{user.address.city}}")
-	vars := ExtractVariables(tpl, nil)
+	tpl := handlebars.MustParse("{{user.address.city}}")
+	vars := ExtractVariables(tpl.AST(), nil)
 
 	assertHasVar(t, vars, "user.address.city", true, nil)
 }
 
 func TestExtractVariables_IfBlockConditional(t *testing.T) {
-	tpl := MustParse("{{#if premium}}{{billing.plan}}{{/if}}")
-	vars := ExtractVariables(tpl, nil)
+	tpl := handlebars.MustParse("{{#if premium}}{{billing.plan}}{{/if}}")
+	vars := ExtractVariables(tpl.AST(), nil)
 
 	// premium is the condition variable — it's required (needs to be checked)
 	assertHasVar(t, vars, "premium", true, nil)
@@ -38,8 +40,8 @@ func TestExtractVariables_IfBlockConditional(t *testing.T) {
 }
 
 func TestExtractVariables_IfElseBlock(t *testing.T) {
-	tpl := MustParse("{{#if active}}{{name}}{{else}}{{fallbackName}}{{/if}}")
-	vars := ExtractVariables(tpl, nil)
+	tpl := handlebars.MustParse("{{#if active}}{{name}}{{else}}{{fallbackName}}{{/if}}")
+	vars := ExtractVariables(tpl.AST(), nil)
 
 	assertHasVar(t, vars, "active", true, nil)
 	assertHasVar(t, vars, "name", false, []string{"active"})
@@ -47,8 +49,8 @@ func TestExtractVariables_IfElseBlock(t *testing.T) {
 }
 
 func TestExtractVariables_NestedIf(t *testing.T) {
-	tpl := MustParse("{{#if a}}{{#if b}}{{deep}}{{/if}}{{/if}}")
-	vars := ExtractVariables(tpl, nil)
+	tpl := handlebars.MustParse("{{#if a}}{{#if b}}{{deep}}{{/if}}{{/if}}")
+	vars := ExtractVariables(tpl.AST(), nil)
 
 	assertHasVar(t, vars, "a", true, nil)
 	assertHasVar(t, vars, "b", false, []string{"a"})
@@ -56,16 +58,16 @@ func TestExtractVariables_NestedIf(t *testing.T) {
 }
 
 func TestExtractVariables_UnlessBlock(t *testing.T) {
-	tpl := MustParse("{{#unless hidden}}{{content}}{{/unless}}")
-	vars := ExtractVariables(tpl, nil)
+	tpl := handlebars.MustParse("{{#unless hidden}}{{content}}{{/unless}}")
+	vars := ExtractVariables(tpl.AST(), nil)
 
 	assertHasVar(t, vars, "hidden", true, nil)
 	assertHasVar(t, vars, "content", false, []string{"hidden"})
 }
 
 func TestExtractVariables_EachBlock(t *testing.T) {
-	tpl := MustParse("{{#each items}}{{name}}{{/each}}")
-	vars := ExtractVariables(tpl, nil)
+	tpl := handlebars.MustParse("{{#each items}}{{name}}{{/each}}")
+	vars := ExtractVariables(tpl.AST(), nil)
 
 	// items is required — it's the iteration target
 	assertHasVar(t, vars, "items", true, nil)
@@ -74,8 +76,8 @@ func TestExtractVariables_EachBlock(t *testing.T) {
 }
 
 func TestExtractVariables_WithBlock(t *testing.T) {
-	tpl := MustParse("{{#with user}}{{name}}{{/with}}")
-	vars := ExtractVariables(tpl, nil)
+	tpl := handlebars.MustParse("{{#with user}}{{name}}{{/with}}")
+	vars := ExtractVariables(tpl.AST(), nil)
 
 	assertHasVar(t, vars, "user", true, nil)
 }
@@ -83,8 +85,8 @@ func TestExtractVariables_WithBlock(t *testing.T) {
 func TestExtractVariables_HelperWithParams(t *testing.T) {
 	// When a helper is called with params, the params are variables, not the helper name
 	helpers := map[string]bool{"formatDate": true}
-	tpl := MustParse("{{formatDate createdAt}}")
-	vars := ExtractVariables(tpl, helpers)
+	tpl := handlebars.MustParse("{{formatDate createdAt}}")
+	vars := ExtractVariables(tpl.AST(), helpers)
 
 	assertNoVar(t, vars, "formatDate") // helper, not a variable
 	assertHasVar(t, vars, "createdAt", true, nil)
@@ -92,8 +94,8 @@ func TestExtractVariables_HelperWithParams(t *testing.T) {
 
 func TestExtractVariables_HelperWithMultipleParams(t *testing.T) {
 	helpers := map[string]bool{"concat": true}
-	tpl := MustParse("{{concat firstName lastName}}")
-	vars := ExtractVariables(tpl, helpers)
+	tpl := handlebars.MustParse("{{concat firstName lastName}}")
+	vars := ExtractVariables(tpl.AST(), helpers)
 
 	assertNoVar(t, vars, "concat")
 	assertHasVar(t, vars, "firstName", true, nil)
@@ -102,8 +104,8 @@ func TestExtractVariables_HelperWithMultipleParams(t *testing.T) {
 
 func TestExtractVariables_HelperWithHashParams(t *testing.T) {
 	helpers := map[string]bool{"input": true}
-	tpl := MustParse("{{input value=userName placeholder=defaultText}}")
-	vars := ExtractVariables(tpl, helpers)
+	tpl := handlebars.MustParse("{{input value=userName placeholder=defaultText}}")
+	vars := ExtractVariables(tpl.AST(), helpers)
 
 	assertNoVar(t, vars, "input")
 	assertHasVar(t, vars, "userName", true, nil)
@@ -112,8 +114,8 @@ func TestExtractVariables_HelperWithHashParams(t *testing.T) {
 
 func TestExtractVariables_AmbiguousWithoutHelper(t *testing.T) {
 	// Without a helper registry, {{foo}} is treated as a variable
-	tpl := MustParse("{{foo}}")
-	vars := ExtractVariables(tpl, nil)
+	tpl := handlebars.MustParse("{{foo}}")
+	vars := ExtractVariables(tpl.AST(), nil)
 
 	assertHasVar(t, vars, "foo", true, nil)
 }
@@ -121,8 +123,8 @@ func TestExtractVariables_AmbiguousWithoutHelper(t *testing.T) {
 func TestExtractVariables_AmbiguousWithHelper(t *testing.T) {
 	// With a helper registry, {{foo}} is recognized as a helper
 	helpers := map[string]bool{"foo": true}
-	tpl := MustParse("{{foo}}")
-	vars := ExtractVariables(tpl, helpers)
+	tpl := handlebars.MustParse("{{foo}}")
+	vars := ExtractVariables(tpl.AST(), helpers)
 
 	assertNoVar(t, vars, "foo")
 }
@@ -130,8 +132,8 @@ func TestExtractVariables_AmbiguousWithHelper(t *testing.T) {
 func TestExtractVariables_UnambiguousHelper(t *testing.T) {
 	// {{foo bar}} is unambiguously a helper call — foo has params
 	// Even without a helper registry, foo should not be a variable
-	tpl := MustParse("{{foo bar}}")
-	vars := ExtractVariables(tpl, nil)
+	tpl := handlebars.MustParse("{{foo bar}}")
+	vars := ExtractVariables(tpl.AST(), nil)
 
 	assertNoVar(t, vars, "foo") // foo is a helper (has params)
 	assertHasVar(t, vars, "bar", true, nil)
@@ -139,8 +141,8 @@ func TestExtractVariables_UnambiguousHelper(t *testing.T) {
 
 func TestExtractVariables_IgnoresDataVariables(t *testing.T) {
 	// @index, @key, @first, @last are built-in data variables
-	tpl := MustParse("{{#each items}}{{@index}}:{{name}}{{/each}}")
-	vars := ExtractVariables(tpl, nil)
+	tpl := handlebars.MustParse("{{#each items}}{{@index}}:{{name}}{{/each}}")
+	vars := ExtractVariables(tpl.AST(), nil)
 
 	assertHasVar(t, vars, "items", true, nil)
 	assertNoVar(t, vars, "@index")
@@ -148,8 +150,8 @@ func TestExtractVariables_IgnoresDataVariables(t *testing.T) {
 
 func TestExtractVariables_IgnoresLiterals(t *testing.T) {
 	helpers := map[string]bool{"helper": true}
-	tpl := MustParse(`{{helper "literal" 42 true}}`)
-	vars := ExtractVariables(tpl, helpers)
+	tpl := handlebars.MustParse(`{{helper "literal" 42 true}}`)
+	vars := ExtractVariables(tpl.AST(), helpers)
 
 	if len(vars) != 0 {
 		t.Errorf("expected no variables, got %v", vars)
@@ -157,23 +159,23 @@ func TestExtractVariables_IgnoresLiterals(t *testing.T) {
 }
 
 func TestExtractVariables_PartialParams(t *testing.T) {
-	tpl := MustParse("{{> myPartial user}}")
-	vars := ExtractVariables(tpl, nil)
+	tpl := handlebars.MustParse("{{> myPartial user}}")
+	vars := ExtractVariables(tpl.AST(), nil)
 
 	assertHasVar(t, vars, "user", true, nil)
 }
 
 func TestExtractVariables_PartialHashParams(t *testing.T) {
-	tpl := MustParse("{{> myPartial name=hero}}")
-	vars := ExtractVariables(tpl, nil)
+	tpl := handlebars.MustParse("{{> myPartial name=hero}}")
+	vars := ExtractVariables(tpl.AST(), nil)
 
 	assertHasVar(t, vars, "hero", true, nil)
 }
 
 func TestExtractVariables_Deduplication(t *testing.T) {
 	// Same variable used twice should only appear once
-	tpl := MustParse("{{name}} and {{name}}")
-	vars := ExtractVariables(tpl, nil)
+	tpl := handlebars.MustParse("{{name}} and {{name}}")
+	vars := ExtractVariables(tpl.AST(), nil)
 
 	count := 0
 	for _, v := range vars {
@@ -188,8 +190,8 @@ func TestExtractVariables_Deduplication(t *testing.T) {
 
 func TestExtractVariables_DedupPreservesRequired(t *testing.T) {
 	// If a variable appears both required and conditional, it should be marked required
-	tpl := MustParse("{{name}}{{#if active}}{{name}}{{/if}}")
-	vars := ExtractVariables(tpl, nil)
+	tpl := handlebars.MustParse("{{name}}{{#if active}}{{name}}{{/if}}")
+	vars := ExtractVariables(tpl.AST(), nil)
 
 	v := findVar(vars, "name")
 	if v == nil {
@@ -216,8 +218,8 @@ Hello {{firstName}} {{lastName}},
 {{/each}}
 `
 	helpers := map[string]bool{}
-	tpl := MustParse(source)
-	vars := ExtractVariables(tpl, helpers)
+	tpl := handlebars.MustParse(source)
+	vars := ExtractVariables(tpl.AST(), helpers)
 
 	assertHasVar(t, vars, "firstName", true, nil)
 	assertHasVar(t, vars, "lastName", true, nil)
@@ -229,8 +231,8 @@ Hello {{firstName}} {{lastName}},
 }
 
 func TestExtractVariables_Location(t *testing.T) {
-	tpl := MustParse("{{name}}")
-	vars := ExtractVariables(tpl, nil)
+	tpl := handlebars.MustParse("{{name}}")
+	vars := ExtractVariables(tpl.AST(), nil)
 
 	if len(vars) == 0 {
 		t.Fatal("expected at least one variable")
@@ -242,13 +244,20 @@ func TestExtractVariables_Location(t *testing.T) {
 
 func TestExtractVariables_BuiltInHelpers(t *testing.T) {
 	// Built-in helpers (if, each, unless, with) should not appear as variables
-	tpl := MustParse("{{#if x}}{{#each y}}{{#unless z}}{{#with w}}{{/with}}{{/unless}}{{/each}}{{/if}}")
-	vars := ExtractVariables(tpl, nil)
+	tpl := handlebars.MustParse("{{#if x}}{{#each y}}{{#unless z}}{{#with w}}{{/with}}{{/unless}}{{/each}}{{/if}}")
+	vars := ExtractVariables(tpl.AST(), nil)
 
 	assertNoVar(t, vars, "if")
 	assertNoVar(t, vars, "each")
 	assertNoVar(t, vars, "unless")
 	assertNoVar(t, vars, "with")
+}
+
+func TestExtractVariables_NilProgram(t *testing.T) {
+	vars := ExtractVariables(nil, nil)
+	if vars != nil {
+		t.Errorf("expected nil, got %v", vars)
+	}
 }
 
 // --- test helpers ---

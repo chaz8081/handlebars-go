@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	handlebars "github.com/chaz8081/hbs/v4"
+	"github.com/chaz8081/hbs/v4/validate"
 )
 
 type lintResult struct {
@@ -160,7 +161,7 @@ func lintFile(path string, data interface{}, helpers map[string]bool) lintResult
 
 	// If data provided, validate template variables against it
 	if data != nil {
-		validationErrors := handlebars.Validate(tpl, data, helpers)
+		validationErrors := validate.Validate(tpl.AST(), data, helpers)
 		for _, ve := range validationErrors {
 			result.Valid = false
 			result.Errors = append(result.Errors, lintError{

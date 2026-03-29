@@ -1,4 +1,6 @@
-package handlebars
+// Package analysis provides static analysis tools for Handlebars templates.
+// It operates on parsed ASTs and does not depend on the template evaluation engine.
+package analysis
 
 import (
 	"strings"
@@ -23,12 +25,11 @@ var builtInBlockHelpers = map[string]bool{
 	"each":   true,
 }
 
-// ExtractVariables walks the template's AST and returns all referenced variables
+// ExtractVariables walks the template AST and returns all referenced variables
 // as a flat list. The helpers parameter provides known helper names for disambiguation:
 // if a bare {{foo}} matches a known helper, it's excluded from the variable list.
 // Pass nil if no helper disambiguation is needed.
-func ExtractVariables(tpl *Template, helpers map[string]bool) []TemplateVar {
-	program := tpl.AST()
+func ExtractVariables(program *ast.Program, helpers map[string]bool) []TemplateVar {
 	if program == nil {
 		return nil
 	}

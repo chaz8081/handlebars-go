@@ -1,4 +1,7 @@
-package handlebars
+// Package validate provides condition-aware validation of Handlebars templates
+// against runtime data. It operates on parsed ASTs and checks that all required
+// fields exist in the provided data, respecting conditional branches.
+package validate
 
 import (
 	"fmt"
@@ -18,15 +21,22 @@ func (e ValidationError) Error() string {
 	return e.Message
 }
 
+// builtInBlockHelpers are helpers that affect control flow / conditionality.
+var builtInBlockHelpers = map[string]bool{
+	"if":     true,
+	"unless": true,
+	"with":   true,
+	"each":   true,
+}
+
 // Validate checks that the provided data contains all fields required by the
 // template for the active execution path. It is condition-aware: if a field is
 // inside an {{#if}} block and the condition is falsy in the actual data, those
 // fields are not checked. Returns a list of all missing fields (collect-all mode).
 //
 // The helpers parameter provides known helper names for disambiguation, same as
-// ExtractVariables. Pass nil if no disambiguation is needed.
-func Validate(tpl *Template, data interface{}, helpers map[string]bool) []ValidationError {
-	program := tpl.AST()
+// analysis.ExtractVariables. Pass nil if no disambiguation is needed.
+func Validate(program *ast.Program, data interface{}, helpers map[string]bool) []ValidationError {
 	if program == nil {
 		return nil
 	}
@@ -172,6 +182,37 @@ func isNilValue(v reflect.Value) bool {
 		return v.IsNil()
 	}
 	return false
+}
+
+// isTrueValue reports whether the value is 'true', in the sense of not the zero of its type,
+// and whether the value is valid (has a meaningful truth value).
+//
+// NOTE: borrowed from https://github.com/golang/go/tree/master/src/text/template/exec.go
+func isTrueValue(val reflect.Value) (truth, ok bool) {
+	if !val.IsValid() {
+		return false, true
+	}
+	switch val.Kind() {
+	case reflect.Array, reflect.Map, reflect.Slice, reflect.String:
+		truth = val.Len() > 0
+	case reflect.Bool:
+		truth = val.Bool()
+	case reflect.Complex64, reflect.Complex128:
+		truth = val.Complex() != 0
+	case reflect.Chan, reflect.Func, reflect.Ptr, reflect.Interface:
+		truth = !val.IsNil()
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		truth = val.Int() != 0
+	case reflect.Float32, reflect.Float64:
+		truth = val.Float() != 0
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		truth = val.Uint() != 0
+	case reflect.Struct:
+		truth = true // Struct values are always true.
+	default:
+		return
+	}
+	return truth, true
 }
 
 func (v *validator) validateProgram(node *ast.Program, ctx reflect.Value) {

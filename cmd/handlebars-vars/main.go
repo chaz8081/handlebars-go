@@ -18,6 +18,7 @@ import (
 	"strings"
 
 	handlebars "github.com/chaz8081/hbs/v4"
+	"github.com/chaz8081/hbs/v4/analysis"
 )
 
 type fileVars struct {
@@ -115,7 +116,7 @@ func extractFileVars(path string, helpers map[string]bool, requiredOnly bool) (f
 		return fileVars{}, fmt.Errorf("parse error: %w", err)
 	}
 
-	vars := handlebars.ExtractVariables(tpl, helpers)
+	vars := analysis.ExtractVariables(tpl.AST(), helpers)
 
 	result := fileVars{File: path}
 	for _, v := range vars {
