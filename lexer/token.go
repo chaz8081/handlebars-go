@@ -128,36 +128,36 @@ type Token struct {
 
 // tokenName permits to display token name given token type
 var tokenName = map[TokenKind]string{
-	TokenError:            "Error",
-	TokenEOF:              "EOF",
-	TokenContent:          "Content",
-	TokenComment:          "Comment",
-	TokenOpen:             "Open",
-	TokenClose:            "Close",
-	TokenOpenUnescaped:    "OpenUnescaped",
-	TokenCloseUnescaped:   "CloseUnescaped",
-	TokenOpenBlock:        "OpenBlock",
-	TokenOpenEndBlock:     "OpenEndBlock",
-	TokenOpenRawBlock:     "OpenRawBlock",
-	TokenCloseRawBlock:    "CloseRawBlock",
-	TokenOpenEndRawBlock:  "OpenEndRawBlock",
-	TokenOpenBlockParams:  "OpenBlockParams",
-	TokenCloseBlockParams: "CloseBlockParams",
-	TokenInverse:          "Inverse",
-	TokenOpenInverse:      "OpenInverse",
-	TokenOpenInverseChain: "OpenInverseChain",
-	TokenOpenPartial:      "OpenPartial",
-	TokenOpenBlockPartial: "OpenBlockPartial",
+	TokenError:              "Error",
+	TokenEOF:                "EOF",
+	TokenContent:            "Content",
+	TokenComment:            "Comment",
+	TokenOpen:               "Open",
+	TokenClose:              "Close",
+	TokenOpenUnescaped:      "OpenUnescaped",
+	TokenCloseUnescaped:     "CloseUnescaped",
+	TokenOpenBlock:          "OpenBlock",
+	TokenOpenEndBlock:       "OpenEndBlock",
+	TokenOpenRawBlock:       "OpenRawBlock",
+	TokenCloseRawBlock:      "CloseRawBlock",
+	TokenOpenEndRawBlock:    "OpenEndRawBlock",
+	TokenOpenBlockParams:    "OpenBlockParams",
+	TokenCloseBlockParams:   "CloseBlockParams",
+	TokenInverse:            "Inverse",
+	TokenOpenInverse:        "OpenInverse",
+	TokenOpenInverseChain:   "OpenInverseChain",
+	TokenOpenPartial:        "OpenPartial",
+	TokenOpenBlockPartial:   "OpenBlockPartial",
 	TokenOpenDecoratorBlock: "OpenDecoratorBlock",
-	TokenOpenSexpr:        "OpenSexpr",
-	TokenCloseSexpr:       "CloseSexpr",
-	TokenID:               "ID",
-	TokenEquals:           "Equals",
-	TokenString:           "String",
-	TokenNumber:           "Number",
-	TokenBoolean:          "Boolean",
-	TokenData:             "Data",
-	TokenSep:              "Sep",
+	TokenOpenSexpr:          "OpenSexpr",
+	TokenCloseSexpr:         "CloseSexpr",
+	TokenID:                 "ID",
+	TokenEquals:             "Equals",
+	TokenString:             "String",
+	TokenNumber:             "Number",
+	TokenBoolean:            "Boolean",
+	TokenData:               "Data",
+	TokenSep:                "Sep",
 }
 
 // String returns the token kind string representation for debugging.
@@ -177,7 +177,7 @@ func (t Token) String() string {
 		result += fmt.Sprintf("%d:", t.Pos)
 	}
 
-	result += fmt.Sprintf("%s", t.Kind)
+	result += t.Kind.String()
 
 	if (dumpAllTokensVal || (t.Kind >= TokenContent)) && len(t.Val) > 0 {
 		if len(t.Val) > 100 {

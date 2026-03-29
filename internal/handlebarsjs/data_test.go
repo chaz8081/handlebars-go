@@ -6,10 +6,9 @@ import (
 	"github.com/chaz8081/hbs/v4"
 )
 
-//
 // Those tests come from:
-//   https://github.com/wycats/handlebars.js/blob/master/spec/data.js
 //
+//	https://github.com/wycats/handlebars.js/blob/master/spec/data.js
 var dataTests = []Test{
 	{
 		"passing in data to a compiled function that expects data - works with helpers",

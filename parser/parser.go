@@ -20,9 +20,6 @@ type parser struct {
 	// Lexer
 	lex *lexer.Lexer
 
-	// Root node
-	root ast.Node
-
 	// Tokens parsed but not consumed yet
 	tokens []*lexer.Token
 
@@ -313,7 +310,8 @@ func (p *parser) parseBlock() *ast.BlockStatement {
 // TODO: This was totally cargo culted ! CHECK THAT !
 //
 // cf. prepareBlock() in:
-//   https://github.com/wycats/handlebars.js/blob/master/lib/handlebars/compiler/helper.js
+//
+//	https://github.com/wycats/handlebars.js/blob/master/lib/handlebars/compiler/helper.js
 func setBlockInverseStrip(block *ast.BlockStatement) {
 	if block.Inverse == nil {
 		return
@@ -370,7 +368,8 @@ func (p *parser) parseOpenBlockExpression(tok *lexer.Token) (*ast.BlockStatement
 }
 
 // inverseChain : openInverseChain program inverseChain?
-//              | inverseAndProgram
+//
+//	| inverseAndProgram
 func (p *parser) parseInverseChain() *ast.Program {
 	if p.isInverse() {
 		// inverseAndProgram
@@ -471,7 +470,8 @@ func (p *parser) parseCloseBlock(block *ast.BlockStatement) {
 }
 
 // mustache : OPEN helperName param* hash? CLOSE
-//          | OPEN_UNESCAPED helperName param* hash? CLOSE_UNESCAPED
+//
+//	| OPEN_UNESCAPED helperName param* hash? CLOSE_UNESCAPED
 func (p *parser) parseMustache() *ast.MustacheStatement {
 	// OPEN | OPEN_UNESCAPED
 	tok := p.shift()
@@ -525,7 +525,6 @@ func (p *parser) parsePartial() *ast.PartialStatement {
 
 	return result
 }
-
 
 // parseBlockPartial parses {{#> partialName param* hash?}}...{{/partialName}}
 func (p *parser) parseBlockPartial() *ast.PartialStatement {
@@ -655,7 +654,7 @@ func (p *parser) parseBlockParams() []string {
 	var result []string
 
 	// OPEN_BLOCK_PARAMS
-	tok := p.shift()
+	p.shift()
 
 	// ID+
 	for p.isID() {
@@ -667,7 +666,7 @@ func (p *parser) parseBlockParams() []string {
 	}
 
 	// CLOSE_BLOCK_PARAMS
-	tok = p.shift()
+	tok := p.shift()
 	if tok.Kind != lexer.TokenCloseBlockParams {
 		errExpected(lexer.TokenCloseBlockParams, tok)
 	}
@@ -756,7 +755,8 @@ func (p *parser) parseDataName() *ast.PathExpression {
 
 // path : pathSegments
 // pathSegments : pathSegments SEP ID
-//              | ID
+//
+//	| ID
 func (p *parser) parsePath(data bool) *ast.PathExpression {
 	var tok *lexer.Token
 

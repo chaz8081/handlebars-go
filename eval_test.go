@@ -182,7 +182,7 @@ func TestEvalStruct(t *testing.T) {
 		Person{"Jean", "Valjean"},
 		"Life is difficult",
 		[]Comment{
-			Comment{
+			{
 				Person{"Marcel", "Beliveau"},
 				"LOL!",
 			},

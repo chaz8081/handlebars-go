@@ -9,7 +9,8 @@ import (
 // whitespaceVisitor walks through the AST to perform whitespace control
 //
 // The logic was shamelessly borrowed from:
-//   https://github.com/wycats/handlebars.js/blob/master/lib/handlebars/compiler/whitespace-control.js
+//
+//	https://github.com/wycats/handlebars.js/blob/master/lib/handlebars/compiler/whitespace-control.js
 type whitespaceVisitor struct {
 	isRootSeen bool
 }

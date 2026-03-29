@@ -21,15 +21,6 @@ func echoHelper(str string) string {
 	return str
 }
 
-func echoNbHelper(str string, nb int) string {
-	result := ""
-	for i := 0; i < nb; i++ {
-		result += str
-	}
-
-	return result
-}
-
 func linkHelper(prefix string, options *handlebars.Options) string {
 	return fmt.Sprintf(`<a href="%s/%s">%s</a>`, prefix, options.ValueStr("url"), options.ValueStr("text"))
 }
@@ -94,10 +85,9 @@ func detectDataHelper(options *handlebars.Options) string {
 	return ""
 }
 
-//
 // Those tests come from:
-//   https://github.com/wycats/handlebars.js/blob/master/spec/helper.js
 //
+//	https://github.com/wycats/handlebars.js/blob/master/spec/helper.js
 var helpersTests = []Test{
 	{
 		"helper with complex lookup",
