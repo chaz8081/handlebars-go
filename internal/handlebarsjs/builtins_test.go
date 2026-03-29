@@ -2,10 +2,9 @@ package handlebarsjs
 
 import "testing"
 
-//
 // Those tests come from:
-//   https://github.com/wycats/handlebars.js/blob/master/spec/builtin.js
 //
+//	https://github.com/wycats/handlebars.js/blob/master/spec/builtin.js
 var builtinsTests = []Test{
 	{
 		"#if - if with boolean argument shows the contents when true",

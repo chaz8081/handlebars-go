@@ -6,10 +6,9 @@ import (
 	"github.com/chaz8081/hbs/v4"
 )
 
-//
 // Those tests come from:
-//   https://github.com/wycats/handlebars.js/blob/master/spec/subexpression.js
 //
+//	https://github.com/wycats/handlebars.js/blob/master/spec/subexpression.js
 var subexpressionsTests = []Test{
 	{
 		"arg-less helper",

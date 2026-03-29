@@ -133,7 +133,7 @@ func TestVarInfo_JSONMarshal(t *testing.T) {
 		Conditions: []string{"active"},
 		Line:       5,
 		Position:   10,
-		Source:      "mustache",
+		Source:     "mustache",
 	}
 
 	b, err := json.Marshal(vi)
