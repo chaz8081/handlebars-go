@@ -14,6 +14,7 @@ Handlebars for [golang](https://golang.org) with the same features as [handlebar
 - [Quick Start](#quick-start)
 - [Correct Usage](#correct-usage)
 - [Context](#context)
+- [Comments](#comments)
 - [HTML Escaping](#html-escaping)
 - [Helpers](#helpers)
   - [Template Helpers](#template-helpers)
@@ -273,6 +274,24 @@ Output:
   <div class="body">LOL!</div>
 </div>
 ```
+
+## Comments
+
+You can add comments to templates that won't appear in the output. Use `{{!` for inline comments and `{{!--` for comments that may contain `}}`:
+
+```html
+{{! This is a simple comment }}
+
+{{!-- This comment can contain }} characters --}}
+
+<div class="entry">
+  {{! Only output author if set }}
+  {{#if author}}
+    <h1>{{author}}</h1>
+  {{/if}}
+</div>
+```
+
 
 ## HTML Escaping
 
