@@ -1,5 +1,42 @@
 # Changelog
 
+### hbs 4.0.0 _(March 29, 2026)_
+
+Full Handlebars v4 spec compliance.
+
+**Breaking Changes**
+- Minimum Go version bumped to 1.22
+
+**Handlebars v4 Features**
+- Subexpressions (`{{foo (bar baz)}}`)
+- Raw blocks (`{{{{raw}}}}...{{{{/raw}}}}`)
+- Inline partials (`{{#*inline "name"}}...{{/inline}}`)
+- Partial blocks (`{{#> partial}}fallback{{/partial}}`) and `@partial-block`
+- Decorators (`{{* decorator}}` and `{{#* decorator}}`)
+- Block parameters (`{{#each items as |item index|}}`)
+- `@data` variables (`@root`, `@first`, `@last`, `@index`, `@key`)
+- `helperMissing` / `blockHelperMissing` hooks
+- Strict mode (`Template.SetStrict()`)
+- Chained else (`{{else if}}`)
+- Dynamic partials via subexpressions (`{{> (lookup . "name")}}`)
+- Whitespace control (`{{~expression~}}`)
+- `includeZero` flag for helpers
+- Raw block helpers with `options.RawContent()`
+
+**New Features**
+- CLI tools: `handlebars-lint`, `handlebars-vars`, `handlebars-gen`
+- VS Code extension with syntax highlighting, autocomplete, and lint integration
+- Template variable extraction (`ExtractVariables`)
+- Template validation (`Validate`)
+- AST access (`Template.AST()`, `NewTemplateFromAST()`)
+
+**Improvements**
+- Mustache spec updated to v1.4.3
+- CI/CD with GitHub Actions (Go 1.22–1.26)
+- golangci-lint v2 with staticcheck, errcheck, govet, unused, gofmt
+- Dependabot for Go modules and GitHub Actions
+- Comprehensive nil-safety handling
+
 ### Handlebars 3.0.0 _(July 14, 2021)_
 - Hard Fork from Raymond. Rebrand "handlebars"
 - Start with major version number 3 tracking supported version of Handlebars.js
