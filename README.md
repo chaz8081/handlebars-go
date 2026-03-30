@@ -33,7 +33,7 @@ Handlebars for [golang](https://golang.org) with the same features as [handlebar
     - [Context Values](#context-values)
     - [Helper Hash Arguments](#helper-hash-arguments)
     - [Private Data](#private-data)
-  - [Utilites](#utilites)
+  - [Utilities](#utilities)
     - [`Str()`](#str)
     - [`IsTrue()`](#istrue)
 - [Context Functions](#context-functions)
@@ -59,7 +59,7 @@ Handlebars for [golang](https://golang.org) with the same features as [handlebar
 - [Handlebars Parser](#handlebars-parser)
 - [Test](#test)
 - [References](#references)
-- [Others Implementations](#others-implementations)
+- [Other Implementations](#other-implementations)
 
 
 ## Quick Start
@@ -111,7 +111,7 @@ Displays:
 </div>
 ```
 
-Please note that the template will be parsed everytime you call `Render()` function. So you probably want to read the next section.
+Note that the template is parsed every time you call `Render()`. To avoid this overhead, see the next section.
 
 
 ## Correct Usage
@@ -200,7 +200,7 @@ The rendering context can contain any type of values, including `array`, `slice`
 
 When using structs, be warned that only exported fields are accessible. However you can access exported fields in template with their lowercase names. For example, both `{{author.firstName}}` and `{{Author.FirstName}}` references give the same result, as long as `Author` and `FirstName` are exported struct fields.
 
-More, you can use the `handlebars` struct tag to specify a template variable name different from the struct field name.
+You can also use the `handlebars` struct tag to specify a template variable name different from the struct field name.
 
 ```go
 package main
@@ -461,7 +461,7 @@ tpl.RegisterHelper("fullName", func(firstName, lastName string) string {
 
 ### Built-In Helpers
 
-Those built-in helpers are available to all templates.
+The following built-in helpers are available to all templates.
 
 
 #### The `if` block helper
@@ -669,7 +669,7 @@ Supported levels: `debug`, `info` (default), `warn`, `error`.
 
 #### The `equal` helper
 
-The `equal` helper renders a block if the string version of both arguments are equals.
+The `equal` helper renders a block if the string version of both arguments are equal.
 
 For example that template:
 
@@ -768,7 +768,7 @@ Note that as the first parameter of the helper is typed as `bool` an automatic c
 ctx := map[string]interface{}{"yep": "message"}
 ```
 
-Here, `"message"` is converted to `true` because it is an non-empty string. See `IsTrue()` function for more informations on boolean conversion.
+Here, `"message"` is converted to `true` because it is an non-empty string. See `IsTrue()` for more information on boolean conversion.
 
 
 #### Else Block Evaluation
@@ -901,12 +901,12 @@ handlebars.RegisterHelper("add", func(val1, val2 int) string {
 })
 ```
 
-Will simply panics, because we call the helper with one argument whereas it expects two.
+Will panic, because the helper is called with one argument but expects two.
 
 
 #### Automatic conversion
 
-Let's create a `concat` helper that expects two strings and concat them:
+Let's create a `concat` helper that expects two strings and concatenates them:
 
 ```go
 source := `{{concat a b}}`
@@ -927,7 +927,7 @@ Everything goes well, two strings are passed as arguments to the helper that out
 Jean VALJEAN
 ```
 
-But what happens if there is another type than `string` in the context ? For example:
+But what happens if the context contains a non-`string` type? For example:
 
 ```go
 ctx := map[string]interface{}{
@@ -936,7 +936,7 @@ ctx := map[string]interface{}{
 }
 ```
 
-Actually, handlebars perfoms automatic string conversion. So because the first parameter of the helper is typed as `string`, the first argument will be converted from the `10` integer to `"10"`, and the helper outputs:
+Handlebars performs automatic string conversion. Because the first parameter is typed as `string`, the integer `10` is converted to `"10"`, and the helper outputs:
 
 ```html
 10 VALJEAN
@@ -962,7 +962,7 @@ The `Options` argument is even necessary for Block Helpers to evaluate block and
 
 #### Context Values
 
-Helpers fetch current context values with `options.Value()` and `options.ValuesStr()`.
+Helpers fetch current context values with `options.Value()` and `options.ValueStr()`.
 
 `Value()` returns an `interface{}` and lets the helper do the type assertions whereas `ValueStr()` automatically converts the value to a `string`.
 
@@ -1054,25 +1054,25 @@ handlebars.RegisterHelper("voodoo", func(options *handlebars.Options) string {
 Helpers that need to evaluate the block with a private data frame and a new context can call `options.FnCtxData()`.
 
 
-### Utilites
+### Utilities
 
-In addition to `Escape()`, handlebars provides utility functions that can be usefull for helpers.
+In addition to `Escape()`, handlebars provides utility functions useful for helpers.
 
 
 #### `Str()`
 
 `Str()` converts its parameter to a `string`.
 
-Booleans:
+Numbers:
 
 ```go
 handlebars.Str(3) + " foos and " + handlebars.Str(-1.25) + " bars"
 // Outputs: "3 foos and -1.25 bars"
 ```
 
-Numbers:
+Booleans:
 
-``` go
+```go
 "everything is " + handlebars.Str(true) + " and nothing is " + handlebars.Str(false)
 // Outputs: "everything is true and nothing is false"
 ```
@@ -1130,7 +1130,7 @@ ctx := map[string]interface{}{
 
 Randomly renders `I hate you` or `I love you`.
 
-Those context functions behave like helper functions: they can be called with parameters and they can have an `Options` argument.
+Context functions behave like helpers: they can be called with parameters and accept an `Options` argument.
 
 
 ## Partials
@@ -1175,7 +1175,7 @@ Output:
 
 ### Global Partials
 
-You can registers global partials that will be accessible by all templates:
+You can register global partials that will be accessible by all templates:
 
 ```go
 handlebars.RegisterPartial("foo", "<span>bar</span>")
@@ -1358,7 +1358,7 @@ tpl.RegisterDecorator("myDecorator", func(options *handlebars.DecoratorOptions) 
 
 ## Utility Functions
 
-You can use following utility fuctions to parse and register partials from files:
+You can use the following utility functions to parse and register partials from files:
 
 - `ParseFile()` - reads a file and return parsed template
 - `Template.RegisterPartialFile()` - reads a file and registers its content as a partial with given name
@@ -1595,7 +1595,7 @@ To filter tests:
 
     $ go test -run="Partials"
 
-To run all test and all benchmarks:
+To run all tests and benchmarks:
 
     $ go test -bench . ./...
 
@@ -1612,7 +1612,7 @@ To test with race detection:
   - <https://www.youtube.com/watch?v=HxaD_trXwRE>
 
 
-## Others Implementations
+## Other Implementations
 
 - [handlebars.js](http://handlebarsjs.com) - javascript
 - [handlebars.java](https://github.com/jknack/handlebars.java) - java
