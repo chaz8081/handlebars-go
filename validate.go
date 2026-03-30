@@ -149,7 +149,7 @@ func resolveField(ctx reflect.Value, name string) reflect.Value {
 		}
 	case reflect.Struct:
 		// Try exact name, then title-cased
-		expName := strings.Title(name)
+		expName := capitalizeFirst(name)
 		if tField, ok := ctx.Type().FieldByName(expName); ok && tField.PkgPath == "" {
 			return ctx.FieldByIndex(tField.Index)
 		}

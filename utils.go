@@ -3,6 +3,7 @@ package handlebars
 import (
 	"path"
 	"reflect"
+	"strings"
 )
 
 // indirect returns the item at the end of indirection, and a bool to indicate if it's nil.
@@ -72,6 +73,15 @@ func canBeNil(typ reflect.Type) bool {
 		return true
 	}
 	return false
+}
+
+// capitalizeFirst uppercases the first letter of s.
+// Used to map template names like "firstName" to exported Go identifiers like "FirstName".
+func capitalizeFirst(s string) string {
+	if s == "" {
+		return s
+	}
+	return strings.ToUpper(s[:1]) + s[1:]
 }
 
 // fileBase returns base file name
